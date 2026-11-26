@@ -1,0 +1,148 @@
+:root {
+  /* Gruvbox dark, mostly its neutrals */
+  --room: #282828;      /* page */
+  --recess: #1d2021;    /* inputs, empty reel */
+  --raised: #3c3836;    /* buttons */
+  --paper: #ebdbb2;     /* text */
+  --mist: #a89984;      /* secondary text */
+  --disk: #4f5f4a;      /* what is on disk, muted because it sits over video */
+  --filled: #b8bb26;    /* how far a video has been played, on the home list */
+  --sponsor: #d79921;
+  --head: #d65d0e;      /* playhead, focus */
+  --bar: .45rem;        /* the reel, and the marks on it, are the same height */
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--room);
+  color: var(--paper);
+  font: 1.0625rem/1.55 Seravek, "Gill Sans Nova", Ubuntu, Calibri, "Noto Sans", "DejaVu Sans", sans-serif;
+}
+
+header, main { width: min(100% - 2rem, 76rem); margin-inline: auto; }
+header { padding-block: 1rem; }
+/* Watching: nothing to paste into, and the video sits half as far down the
+   page as the bar used to push it (the bar came to 4.65rem all told). */
+.watching header { padding-block: 2.32rem 0; }
+.watching header form { display: none; }
+
+.hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+input, select, button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--head); outline-offset: 2px; }
+a { color: inherit; text-decoration-color: var(--disk); text-underline-offset: .2em; }
+a:hover { text-decoration-color: var(--head); }
+
+form { display: flex; gap: .5rem; max-width: 38rem; margin-inline: auto; }
+#url {
+  flex: 1; min-width: 0; padding: .5rem .85rem;
+  background: var(--recess); border: 0; border-radius: 1.4rem;
+}
+#url:focus-visible { outline: 2px solid #7c6f64; outline-offset: 0; }
+#url::placeholder { color: var(--mist); opacity: 1; }
+button {
+  padding: .5rem 1.1rem; border: 0; border-radius: 1.4rem; cursor: pointer;
+  background: var(--raised); color: var(--paper);
+}
+button:hover { background: #504945; }
+
+h1 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; margin: 0; text-wrap: balance; }
+#home, #unsupported { max-width: 36rem; margin-inline: auto; padding-top: 12vh; text-align: center; text-wrap: balance; }
+#home h1, #unsupported h1 { font-size: clamp(1.7rem, 4vw, 2.2rem); line-height: 1.2; margin-bottom: 1.25rem; }
+code { background: var(--recess); padding: .1em .4em; border-radius: .25em; font-size: .92em; overflow-wrap: anywhere; }
+.quiet { color: var(--mist); }
+
+/* The home page's list of what is on disk, newest download first. */
+#library { max-width: 46rem; margin-inline: auto; padding-block: 2rem 4rem; }
+#library h1 { margin-bottom: .25rem; }
+#total { margin: 0 0 1rem; }
+#sent { margin: 0 0 1rem; }
+#sent:empty { display: none; }
+#downloads { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+/* The row holds the look; the link and the x sit side by side inside it. */
+#downloads li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .75rem; padding: .7rem .9rem; border-radius: .5rem; background: var(--recess); }
+#downloads li:hover { background: #32302f; }
+#downloads a { display: grid; gap: .35rem; min-width: 0; text-decoration: none; }
+/* The x and the cone under it, both taking their colour from the same place. */
+#downloads .actions { display: grid; gap: .15rem; }
+#downloads .actions button { padding: 0 .5rem; border-radius: .4rem; background: none; color: var(--mist); }
+#downloads .actions button:hover { background: var(--raised); color: var(--paper); }
+#downloads .remove { font-size: 1.3rem; line-height: 1.4; }
+#downloads .send { display: grid; place-items: center; line-height: 1; padding-block: .2rem; }
+#downloads .name { font-weight: 600; overflow-wrap: anywhere; }
+#downloads .meta { color: var(--mist); font-size: .92em; font-variant-numeric: tabular-nums; }
+#downloads .bar { height: .45rem; border-radius: .25rem; background: #504945; overflow: hidden; }
+#downloads .bar i { display: block; height: 100%; background: var(--filled); transition: width .4s linear; }
+/* With a list to read, the welcome below it stops being the headline. */
+.stocked #home { padding-top: 0; }
+.stocked #home h1 { display: none; }
+
+#stage { position: relative; background: #000; aspect-ratio: 16 / 9; max-height: 80vh; width: 100%; }
+video { display: block; width: 100%; height: 100%; }
+#throbber { position: absolute; inset: 0; margin: auto; width: 5rem; height: 5rem; border-radius: 50%; background: #1d2021d9; pointer-events: none; }
+#throbber::after, .spin { content: ""; border-radius: 50%; border: .3rem solid #504945; border-top-color: var(--sponsor); animation: spin 1s linear infinite; }
+#throbber::after { position: absolute; inset: 1rem; }
+.spin { display: inline-block; width: .9em; height: .9em; border-width: 2px; margin-right: .5em; vertical-align: -.1em; }
+@keyframes spin { to { rotate: 1turn; } }
+@keyframes pulse { 50% { opacity: .3; } }
+/* The whole length of the video: what is on disk, what gets skipped, where you are. */
+#reel { position: relative; height: var(--bar); background: var(--recess); cursor: pointer; touch-action: none; }
+#reel > div { position: absolute; inset-block: 0; }
+#disk { left: 0; width: 0; background: var(--disk); transition: width .4s linear; }
+#marks { inset-inline: 0; }
+#marks i { position: absolute; bottom: 0; height: var(--bar); min-width: 3px; background: var(--sponsor); }
+#head { left: 0; width: 4px; margin-left: -2px; background: var(--head); box-shadow: 0 0 0 1px var(--recess); }
+
+#bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: .25rem 1.5rem; padding-block: .6rem; color: var(--mist); }
+#progress { margin: 0; font-variant-numeric: tabular-nums; }
+/* What the player has to say goes here, under the video, never over the
+   picture. The one thing still drawn on top is the throbber, which is about
+   the video itself rather than a message about it. */
+#status { display: grid; gap: .3rem; min-width: 0; }
+#notice:empty { display: none; }
+#notice, #toast { color: var(--paper); overflow-wrap: anywhere; }
+#notice button { margin-left: .75rem; padding: .25rem .9rem; }
+#toast button { margin-left: .5rem; padding: .15rem .8rem; color: var(--sponsor); }
+#options { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; align-items: center; }
+#options label { cursor: pointer; }
+#options input { accent-color: var(--sponsor); }
+/* The icons read as one group, keeping their distance from the labels, not each other. */
+#options .icons { display: flex; align-items: center; }
+#options .icons > * { display: grid; place-items: center; padding: .25rem .3rem; line-height: 1; background: none; color: var(--mist); text-decoration: none; }
+#options .icons > :hover { color: var(--paper); }
+#options .icons svg { width: 17px; height: 17px; }
+select { background: var(--recess); border: 0; border-radius: .4rem; padding: .2rem .4rem; }
+
+#about { padding-block: 1rem 4rem; max-width: 46rem; }
+#byline { margin: .4rem 0 1.25rem; color: var(--mist); display: flex; flex-wrap: wrap; gap: 0 1.25rem; }
+#byline strong { color: var(--paper); }
+#description { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Inside another site's iframe: just the video and the reel. There is no bar
+   to put messages in, so there they do float over the video after all. */
+.embed header, .embed #progress, .embed #options, .embed #about { display: none; }
+.embed main { width: 100%; }
+.embed #player { display: flex; flex-direction: column; height: 100vh; position: relative; }
+.embed #stage { flex: 1; min-height: 0; max-height: none; aspect-ratio: auto; }
+.embed #reel { flex: none; }
+.embed #bar { padding: 0; }
+.embed #notice, .embed #toast {
+  position: absolute; left: 1rem; top: 1rem; max-width: calc(100% - 2rem);
+  background: var(--room); padding: .6rem 1rem; border-radius: .5rem;
+}
+.embed #toast { left: auto; top: auto; right: 1rem; bottom: 1.5rem; border-radius: 1.4rem; }
+
+@media (max-width: 40rem) {
+  header, main { width: 100%; padding-inline: 1rem; }
+  #stage, #reel { width: auto; margin-inline: -1rem; }
+  .embed main { padding: 0; }
+  .embed #stage, .embed #reel { margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #disk { transition: none; }
+  #throbber::after, .spin { animation: pulse 2s ease-in-out infinite; }
+}

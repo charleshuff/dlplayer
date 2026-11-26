@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>yt-webplayer</title>
+  <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <form action="/go" role="search">
+      <label for="url" class="hidden">YouTube link</label>
+      <input id="url" name="url" placeholder="Paste a YouTube link" autocomplete="off" spellcheck="false" required>
+      <button>Watch</button>
+    </form>
+  </header>
+
+  <main>
+    <section id="library" hidden>
+      <h1>On the server</h1>
+      <p id="total" class="quiet"></p>
+      <p id="sent" class="quiet" role="status"></p>
+      <ol id="downloads"></ol>
+    </section>
+
+    <section id="home" hidden>
+      <h1>Paste a YouTube link to watch it from this server.</h1>
+      <p>The video is downloaded here while you watch, and deleted a few days after the last time anyone played it. Your browser never contacts YouTube.</p>
+      <p>To open YouTube links here automatically, add <code id="origin"></code> as a custom Invidious instance in LibRedirect.</p>
+      <p id="version" class="quiet"></p>
+    </section>
+
+    <section id="unsupported" hidden>
+      <h1>Only single videos can be played here.</h1>
+      <p>Channels, playlists and searches are not available. If you came from a video, paste its link above.</p>
+      <p><a class="youtube" rel="noreferrer noopener">Open this page on YouTube</a></p>
+    </section>
+
+    <section id="player" hidden>
+      <div id="stage">
+        <video id="video" controls playsinline></video>
+        <div id="throbber" role="img" aria-label="Loading"></div>
+      </div>
+
+      <div id="reel" role="slider" tabindex="0" aria-label="Position in video" aria-valuemin="0">
+        <div id="disk"></div>
+        <div id="marks"></div>
+        <div id="head"></div>
+      </div>
+
+      <div id="bar">
+        <!-- Everything the player has to say, under the video rather than over it. -->
+        <div id="status">
+          <p id="progress"><i class="spin" hidden></i><span></span></p>
+          <div id="notice" role="status"></div>
+          <div id="toast" hidden><span></span> <button type="button"></button></div>
+        </div>
+        <div id="options">
+          <label id="sponsor" hidden><input type="checkbox" checked> Skip sponsors</label>
+          <label id="quality" hidden>Quality <select></select></label>
+          <span class="icons">
+            <button id="cast" type="button" hidden title="Send to VLC" aria-label="Send to VLC"></button>
+            <a class="youtube" rel="noreferrer noopener" title="Open on YouTube" aria-label="Open on YouTube"></a>
+            <a href="/" title="Home" aria-label="Home">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M3.5 11 L12 4.2 L20.5 11"/>
+                <path d="M6 9.5 V20 H18 V9.5"/>
+              </svg>
+            </a>
+          </span>
+        </div>
+      </div>
+
+      <div id="about" hidden>
+        <h1 id="title"></h1>
+        <p id="byline"><strong id="channel"></strong> <span id="views"></span> <span id="date"></span></p>
+        <div id="description"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Play it elsewhere: the player's link out to YouTube. -->
+  <template id="play">
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M9.8 8.2 L16.2 12 L9.8 15.8 Z" fill="currentColor"/>
+    </svg>
+  </template>
+
+  <!-- A safety cone, drawn here rather than in script, for the send-to-VLC button. -->
+  <template id="cone">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M12 2.8 L15.2 11 L8.8 11 Z"/>
+      <path d="M7.8 13.6 L16.2 13.6 L18.4 19.2 L5.6 19.2 Z"/>
+      <rect x="3.2" y="20.4" width="17.6" height="2.4" rx="1.2"/>
+    </svg>
+  </template>
+
+  <script src="/static/hls.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
